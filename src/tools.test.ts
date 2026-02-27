@@ -15,12 +15,12 @@ describe("registerTools", () => {
     });
   });
 
-  it("should register all 11 tools", () => {
+  it("should register all 12 tools", () => {
     const toolSpy = vi.spyOn(server, "tool");
 
     registerTools(server, client);
 
-    expect(toolSpy).toHaveBeenCalledTimes(11);
+    expect(toolSpy).toHaveBeenCalledTimes(12);
 
     const registeredNames = toolSpy.mock.calls.map((call) => call[0]);
     expect(registeredNames).toEqual([
@@ -31,6 +31,7 @@ describe("registerTools", () => {
       "deploy",
       "get_application_logs",
       "list_deployments",
+      "list_application_deployments",
       "get_deployment",
       "restart_application",
       "restart_service",

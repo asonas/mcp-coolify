@@ -109,6 +109,20 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
   );
 
   server.tool(
+    "list_application_deployments",
+    "List deployment history for a specific application (includes past deployments, not just active ones)",
+    { uuid: z.string().describe("Application UUID") },
+    async ({ uuid }) => {
+      const deployments = await client.listApplicationDeployments(uuid);
+      return {
+        content: [
+          { type: "text", text: JSON.stringify(deployments, null, 2) },
+        ],
+      };
+    },
+  );
+
+  server.tool(
     "get_deployment",
     "Get deployment details including build logs",
     { uuid: z.string().describe("Deployment UUID") },
