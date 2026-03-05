@@ -2,6 +2,22 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { CoolifyClient } from "./client.js";
 
+export function pickFields(
+  items: unknown[],
+  fields: string[],
+): Record<string, unknown>[] {
+  return items.map((item) => {
+    const record = item as Record<string, unknown>;
+    const picked: Record<string, unknown> = {};
+    for (const field of fields) {
+      if (field in record) {
+        picked[field] = record[field];
+      }
+    }
+    return picked;
+  });
+}
+
 export function registerTools(server: McpServer, client: CoolifyClient): void {
   server.tool(
     "list_applications",
@@ -9,8 +25,9 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     {},
     async () => {
       const apps = await client.listApplications();
+      const summary = pickFields(apps, ["uuid", "name", "status", "fqdn", "description"]);
       return {
-        content: [{ type: "text", text: JSON.stringify(apps, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify(summary, null, 2) }],
       };
     },
   );
@@ -21,8 +38,9 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     {},
     async () => {
       const services = await client.listServices();
+      const summary = pickFields(services, ["uuid", "name", "status", "type", "description"]);
       return {
-        content: [{ type: "text", text: JSON.stringify(services, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify(summary, null, 2) }],
       };
     },
   );
@@ -100,9 +118,10 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     {},
     async () => {
       const deployments = await client.listDeployments();
+      const summary = pickFields(deployments, ["uuid", "status", "created_at"]);
       return {
         content: [
-          { type: "text", text: JSON.stringify(deployments, null, 2) },
+          { type: "text", text: JSON.stringify(summary, null, 2) },
         ],
       };
     },
@@ -114,9 +133,10 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     { uuid: z.string().describe("Application UUID") },
     async ({ uuid }) => {
       const deployments = await client.listApplicationDeployments(uuid);
+      const summary = pickFields(deployments, ["uuid", "status", "created_at"]);
       return {
         content: [
-          { type: "text", text: JSON.stringify(deployments, null, 2) },
+          { type: "text", text: JSON.stringify(summary, null, 2) },
         ],
       };
     },
@@ -166,8 +186,9 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     {},
     async () => {
       const servers = await client.listServers();
+      const summary = pickFields(servers, ["uuid", "name", "ip", "status"]);
       return {
-        content: [{ type: "text", text: JSON.stringify(servers, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify(summary, null, 2) }],
       };
     },
   );
