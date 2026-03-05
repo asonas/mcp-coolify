@@ -18,6 +18,31 @@ describe("pickFields", () => {
     ]);
   });
 
+  it("should pick deployment fields including deployment_uuid, commit, and finished_at", () => {
+    const input = [
+      {
+        id: 145,
+        deployment_uuid: "dep-uuid-1",
+        status: "finished",
+        commit: "abc123",
+        created_at: "2026-03-04T06:31:18.000000Z",
+        finished_at: "2026-03-04T06:31:26.000000Z",
+        logs: "very long logs...",
+        application_id: "5",
+      },
+    ];
+    const result = pickFields(input, ["deployment_uuid", "status", "commit", "created_at", "finished_at"]);
+    expect(result).toEqual([
+      {
+        deployment_uuid: "dep-uuid-1",
+        status: "finished",
+        commit: "abc123",
+        created_at: "2026-03-04T06:31:18.000000Z",
+        finished_at: "2026-03-04T06:31:26.000000Z",
+      },
+    ]);
+  });
+
   it("should omit fields that do not exist on the item", () => {
     const input = [{ uuid: "app-1" }];
     const result = pickFields(input, ["uuid", "name"]);

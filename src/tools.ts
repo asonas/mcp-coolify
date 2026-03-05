@@ -118,7 +118,7 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     {},
     async () => {
       const deployments = await client.listDeployments();
-      const summary = pickFields(deployments, ["uuid", "status", "created_at"]);
+      const summary = pickFields(deployments, ["deployment_uuid", "status", "commit", "created_at", "finished_at"]);
       return {
         content: [
           { type: "text", text: JSON.stringify(summary, null, 2) },
@@ -133,7 +133,7 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
     { uuid: z.string().describe("Application UUID") },
     async ({ uuid }) => {
       const deployments = await client.listApplicationDeployments(uuid);
-      const summary = pickFields(deployments, ["uuid", "status", "created_at"]);
+      const summary = pickFields(deployments, ["deployment_uuid", "status", "commit", "created_at", "finished_at"]);
       return {
         content: [
           { type: "text", text: JSON.stringify(summary, null, 2) },
