@@ -73,7 +73,8 @@ export class CoolifyClient {
   }
 
   async listApplicationDeployments(uuid: string): Promise<unknown[]> {
-    return this.request<unknown[]>(`/deployments/applications/${uuid}`);
+    const result = await this.request<{ deployments: unknown[] }>(`/deployments/applications/${uuid}`);
+    return result.deployments;
   }
 
   async getDeployment(uuid: string): Promise<unknown> {

@@ -202,11 +202,11 @@ describe("CoolifyClient", () => {
 
   describe("listApplicationDeployments", () => {
     it("should fetch deployment history for a specific application", async () => {
-      const mockResponse = [
+      const deployments = [
         { uuid: "dep-1", status: "finished", created_at: "2026-02-26T13:35:00Z" },
         { uuid: "dep-2", status: "failed", created_at: "2026-02-26T12:00:00Z" },
       ];
-      mockFetch(mockResponse);
+      mockFetch({ count: 2, deployments });
 
       const result = await client.listApplicationDeployments("app-1");
 
@@ -214,7 +214,7 @@ describe("CoolifyClient", () => {
         "https://coolify.example.com/api/v1/deployments/applications/app-1",
         expectedHeaders,
       );
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(deployments);
     });
   });
 
