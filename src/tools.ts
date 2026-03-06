@@ -18,6 +18,19 @@ export function pickFields(
   });
 }
 
+export function truncateDeploymentLogs(
+  logsJson: string,
+  lines: number = 100,
+): unknown[] {
+  try {
+    const entries = JSON.parse(logsJson);
+    if (!Array.isArray(entries)) return [];
+    return entries.slice(-lines);
+  } catch {
+    return [];
+  }
+}
+
 export function registerTools(server: McpServer, client: CoolifyClient): void {
   server.tool(
     "list_applications",
@@ -144,13 +157,38 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
 
   server.tool(
     "get_deployment",
-    "Get deployment details including build logs",
+    "Get deployment metadata (use get_deployment_logs for build logs)",
     { uuid: z.string().describe("Deployment UUID") },
     async ({ uuid }) => {
       const deployment = await client.getDeployment(uuid);
+      const summary = pickFields([deployment as Record<string, unknown>], [
+        "deployment_uuid", "status", "commit", "commit_message",
+        "created_at", "finished_at", "force_rebuild", "is_webhook",
+      ]);
       return {
         content: [
-          { type: "text", text: JSON.stringify(deployment, null, 2) },
+          { type: "text", text: JSON.stringify(summary[0], null, 2) },
+        ],
+      };
+    },
+  );
+
+  server.tool(
+    "get_deployment_logs",
+    "Get build logs for a deployment",
+    {
+      uuid: z.string().describe("Deployment UUID"),
+      lines: z
+        .number()
+        .optional()
+        .describe("Number of log lines to retrieve from the end (default: 100)"),
+    },
+    async ({ uuid, lines }) => {
+      const deployment = await client.getDeployment(uuid) as Record<string, unknown>;
+      const logs = truncateDeploymentLogs(deployment.logs as string, lines);
+      return {
+        content: [
+          { type: "text", text: JSON.stringify(logs, null, 2) },
         ],
       };
     },
