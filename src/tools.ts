@@ -109,16 +109,20 @@ export function registerTools(server: McpServer, client: CoolifyClient): void {
 
   server.tool(
     "get_application_logs",
-    "Get runtime logs of a running application",
+    "Get runtime logs of a running application. For docker-compose apps with multiple containers, use container_name to specify which container's logs to retrieve.",
     {
       uuid: z.string().describe("Application UUID"),
       lines: z
         .number()
         .optional()
         .describe("Number of log lines to retrieve (default: 100)"),
+      container_name: z
+        .string()
+        .optional()
+        .describe("Container name to get logs from (for docker-compose apps with multiple containers). Get the container name from get_application response."),
     },
-    async ({ uuid, lines }) => {
-      const result = await client.getApplicationLogs(uuid, lines);
+    async ({ uuid, lines, container_name }) => {
+      const result = await client.getApplicationLogs(uuid, lines, container_name);
       return {
         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
       };

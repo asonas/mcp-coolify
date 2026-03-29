@@ -181,6 +181,18 @@ describe("CoolifyClient", () => {
         expectedHeaders,
       );
     });
+
+    it("should fetch application logs with container_name", async () => {
+      const mockResponse = { logs: "server log\n" };
+      mockFetch(mockResponse);
+
+      await client.getApplicationLogs("app-1", 100, "monsnode-server-abc123");
+
+      expect(fetch).toHaveBeenCalledWith(
+        "https://coolify.example.com/api/v1/applications/app-1/logs?lines=100&container_name=monsnode-server-abc123",
+        expectedHeaders,
+      );
+    });
   });
 
   describe("listDeployments", () => {

@@ -64,8 +64,12 @@ export class CoolifyClient {
     });
   }
 
-  async getApplicationLogs(uuid: string, lines: number = 100): Promise<unknown> {
-    return this.request<unknown>(`/applications/${uuid}/logs?lines=${lines}`);
+  async getApplicationLogs(uuid: string, lines: number = 100, containerName?: string): Promise<unknown> {
+    const params = new URLSearchParams({ lines: String(lines) });
+    if (containerName) {
+      params.set("container_name", containerName);
+    }
+    return this.request<unknown>(`/applications/${uuid}/logs?${params}`);
   }
 
   async listDeployments(): Promise<unknown[]> {
